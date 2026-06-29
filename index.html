@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GMI RECRIA — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde-forte:   rgb(1,67,51);
+  --verde-militar: rgb(66,104,77);
+  --amarelo-forte: rgb(251,190,19);
+  --verde-puro:    rgb(0,200,80);
+  --vermelho:      rgb(220,38,38);
+  --amarelo-warn:  rgb(245,158,11);
+  --sidebar-w: 240px;
+  --bg-page:   #f0f2f5;
+  --bg-card:   #ffffff;
+  --border:    #e2e8f0;
+  --text-1:    #1a202c;
+  --text-2:    #64748b;
+  --text-3:    #94a3b8;
+  --radius:    10px;
+  --shadow:    0 2px 8px rgba(0,0,0,.07);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-page);color:var(--text-1);font-family:'Inter',sans-serif;line-height:1.5;}
+
+/* SIDEBAR */
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--verde-forte);overflow-y:auto;z-index:100;display:flex;flex-direction:column;}
+.sidebar-logo{padding:1.25rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:.5rem;}
+.pluma-logo{display:block;height:26px;width:auto;filter:brightness(0) invert(1);opacity:.7;margin-bottom:.65rem;}
+.sidebar-logo-eyebrow{font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:700;color:rgba(251,190,19,.6);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.45rem;}
+.sidebar-logo-name{font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1;}
+.sidebar-logo-name span{color:var(--amarelo-forte);}
+.sidebar-logo-tag{display:inline-flex;align-items:center;gap:.35rem;margin-top:.55rem;background:rgba(251,190,19,.12);border:1px solid rgba(251,190,19,.2);border-radius:4px;padding:.2rem .5rem;}
+.sidebar-logo-tag-dot{width:5px;height:5px;background:var(--amarelo-forte);border-radius:50%;flex-shrink:0;}
+.sidebar-logo-tag-text{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;}
+.sidebar-section-label{font-size:.6rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;padding:.8rem 1.25rem .3rem;}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1.25rem;color:rgba(255,255,255,.55);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s;border-left:3px solid transparent;text-decoration:none;margin:.05rem 0;}
+.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.06);}
+.nav-item.active{background:rgba(251,190,19,.12);color:var(--amarelo-forte);border-left-color:var(--amarelo-forte);}
+.sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.08);font-size:.68rem;color:rgba(255,255,255,.25);}
+.sidebar-footer span{color:rgba(255,255,255,.4);font-weight:600;}
+
+/* MAIN */
+#main{margin-left:var(--sidebar-w);min-height:100vh;padding:1.75rem 1.75rem 3rem;background:var(--bg-page);}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.topbar-title{font-size:1.3rem;font-weight:800;color:var(--verde-forte);letter-spacing:-.02em;}
+.topbar-title span{color:var(--text-3);font-weight:400;font-size:1rem;margin-left:.4rem;}
+
+/* NAV PAGES */
+.nav-page{display:none;}
+.nav-page.active{display:block;}
+
+/* SECTION HDR */
+.section-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem;}
+.section-hdr-bar{width:4px;height:20px;background:var(--amarelo-forte);border-radius:2px;}
+.section-hdr-title{font-size:1rem;font-weight:700;color:var(--verde-forte);}
+
+/* UPLOAD CARD (dentro do dashboard) */
+.upload-block{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:2.5rem;
+  max-width:560px;
+  margin:0 auto;
+  text-align:center;
+}
+.upload-block-icon{
+  width:64px;height:64px;
+  background:rgba(1,67,51,.07);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.25rem;
+}
+.upload-block-icon svg{width:28px;height:28px;color:var(--verde-forte);}
+.upload-block h2{font-size:1.1rem;font-weight:700;color:var(--verde-forte);margin-bottom:.4rem;}
+.upload-block p{font-size:.82rem;color:var(--text-2);margin-bottom:1.5rem;line-height:1.6;}
+
+.drop-zone{
+  border:2px dashed #c8d8d2;
+  border-radius:var(--radius);
+  padding:2rem 1.5rem;
+  cursor:pointer;
+  transition:all .2s;
+  background:#f8faf9;
+  position:relative;
+  margin-bottom:1rem;
+}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--verde-forte);background:rgba(1,67,51,.04);}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:1.75rem;margin-bottom:.5rem;}
+.drop-text{font-size:.82rem;color:var(--text-2);font-weight:500;}
+.drop-text strong{color:var(--verde-forte);}
+.drop-ext{font-size:.7rem;color:var(--text-3);margin-top:.3rem;}
+
+.upload-file-name{font-size:.78rem;color:var(--verde-militar);font-weight:600;margin-bottom:.75rem;display:none;}
+.upload-file-name.visible{display:block;}
+.upload-error{font-size:.78rem;color:var(--vermelho);margin-top:.6rem;display:none;}
+.upload-error.visible{display:block;}
+
+.load-btn{
+  width:100%;padding:.8rem;
+  background:var(--verde-forte);color:#fff;
+  border:none;border-radius:8px;
+  font-size:.88rem;font-weight:700;
+  cursor:pointer;letter-spacing:.01em;
+  transition:background .18s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  font-family:'Inter',sans-serif;
+}
+.load-btn:hover{background:#025f47;}
+.load-btn:disabled{background:#9db5ae;cursor:not-allowed;}
+
+/* KPI PLACEHOLDER */
+.kpi-placeholder-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1rem;
+  margin-bottom:1.5rem;
+  opacity:.35;
+  pointer-events:none;
+}
+.kpi-card-ph{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:1rem 1.1rem;
+  border-bottom:3px solid #ccc;
+}
+.kpi-ph-label{font-size:.62rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;}
+.kpi-ph-bar{height:28px;background:#e2e8f0;border-radius:4px;margin-bottom:.35rem;}
+.kpi-ph-sub{height:12px;background:#f1f5f9;border-radius:4px;width:65%;}
+
+/* FILTER PLACEHOLDER */
+.filter-placeholder{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:1rem 1.25rem;
+  display:flex;
+  align-items:flex-end;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin-bottom:1.5rem;
+  opacity:.35;
+  pointer-events:none;
+}
+.fp-group{display:flex;flex-direction:column;gap:.35rem;min-width:150px;}
+.fp-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);}
+.fp-select{
+  height:36px;background:#f8fafc;
+  border:1px solid var(--border);border-radius:6px;
+}
+.fp-btn{height:36px;width:80px;background:#e2e8f0;border:none;border-radius:6px;}
+
+/* EMPTY STATE texto */
+.empty-hint{
+  font-size:.78rem;color:var(--text-3);
+  margin-top:2rem;text-align:center;
+}
+
+/* LOADING */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(240,242,245,.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;}
+.loading-overlay.visible{display:flex;}
+.spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:var(--verde-forte);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:.875rem;font-weight:600;color:var(--verde-forte);}
+
+.page-footer{position:fixed;bottom:.75rem;right:1rem;font-size:.6rem;color:var(--text-3);font-family:'Inter',sans-serif;letter-spacing:.04em;pointer-events:none;z-index:50;}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Processando planilha…</div>
+</div>
+
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <img class="pluma-logo" src="Pluma-logomarca.png" alt="Pluma Agroavícola" onerror="this.style.display='none'">
+    <div class="sidebar-logo-eyebrow">Gestão de Matrizes</div>
+    <div class="sidebar-logo-name">GMI <span>Recria</span></div>
+    <div class="sidebar-logo-tag">
+      <div class="sidebar-logo-tag-dot"></div>
+      <div class="sidebar-logo-tag-text">Matrizes de Recria</div>
+    </div>
+  </div>
+  <div class="sidebar-section-label">Indicadores</div>
+  <a class="nav-item active" onclick="setPage('viabilidade',this)">Viabilidade de Recria</a>
+  <a class="nav-item" onclick="setPage('racao',this)">Ração / Fêmea</a>
+  <a class="nav-item" onclick="setPage('custo',this)">Custo Franga Recriada</a>
+  <a class="nav-item" onclick="setPage('custosm',this)">Custo S/ Matriz e Ração</a>
+  <div class="sidebar-footer">by <span>Eduardo &amp; Antonio</span></div>
+</div>
+
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard <span id="active-page-label">Viabilidade de Recria</span></div>
+  </div>
+
+  <!-- FILTER PLACEHOLDER (visual, não funcional) -->
+  <div class="filter-placeholder">
+    <div class="fp-group"><div class="fp-label">Ano / Mês</div><div class="fp-select"></div></div>
+    <div class="fp-group"><div class="fp-label">Unidade</div><div class="fp-select"></div></div>
+    <div class="fp-group"><div class="fp-label">Granja</div><div class="fp-select"></div></div>
+    <div class="fp-group"><div class="fp-label">Lote</div><div class="fp-select"></div></div>
+    <div class="fp-btn"></div>
+  </div>
+
+  <!-- KPI PLACEHOLDER -->
+  <div class="kpi-placeholder-row">
+    <div class="kpi-card-ph"><div class="kpi-ph-label">—</div><div class="kpi-ph-bar"></div><div class="kpi-ph-sub"></div></div>
+    <div class="kpi-card-ph"><div class="kpi-ph-label">—</div><div class="kpi-ph-bar"></div><div class="kpi-ph-sub"></div></div>
+    <div class="kpi-card-ph"><div class="kpi-ph-label">—</div><div class="kpi-ph-bar"></div><div class="kpi-ph-sub"></div></div>
+    <div class="kpi-card-ph"><div class="kpi-ph-label">—</div><div class="kpi-ph-bar"></div><div class="kpi-ph-sub"></div></div>
+  </div>
+
+  <!-- VIABILIDADE -->
+  <div id="page-viabilidade" class="nav-page active">
+    <div class="section-hdr"><div class="section-hdr-bar"></div><div class="section-hdr-title">Viabilidade de Recria</div></div>
+    <div class="upload-block">
+      <div class="upload-block-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h2>Viabilidade de Recria</h2>
+      <p>Carregue a planilha Excel com os dados de viabilidade para visualizar os indicadores deste painel.</p>
+      <div class="drop-zone" id="dz-viabilidade">
+        <input type="file" id="fi-viabilidade" accept=".xlsx,.xls">
+        <div class="drop-icon">📊</div>
+        <div class="drop-text"><strong>Clique para selecionar</strong> ou arraste aqui</div>
+        <div class="drop-ext">Suportado: .xlsx · .xls</div>
+      </div>
+      <div class="upload-file-name" id="fn-viabilidade"></div>
+      <div class="upload-error" id="err-viabilidade"></div>
+      <button class="load-btn" id="btn-viabilidade" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Carregar dados
+      </button>
+    </div>
+  </div>
+
+  <!-- RAÇÃO -->
+  <div id="page-racao" class="nav-page">
+    <div class="section-hdr"><div class="section-hdr-bar"></div><div class="section-hdr-title">Ração / Fêmea</div></div>
+    <div class="upload-block">
+      <div class="upload-block-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h2>Ração / Fêmea</h2>
+      <p>Carregue a planilha Excel com os dados de consumo de ração para visualizar os indicadores deste painel.</p>
+      <div class="drop-zone" id="dz-racao">
+        <input type="file" id="fi-racao" accept=".xlsx,.xls">
+        <div class="drop-icon">📊</div>
+        <div class="drop-text"><strong>Clique para selecionar</strong> ou arraste aqui</div>
+        <div class="drop-ext">Suportado: .xlsx · .xls</div>
+      </div>
+      <div class="upload-file-name" id="fn-racao"></div>
+      <div class="upload-error" id="err-racao"></div>
+      <button class="load-btn" id="btn-racao" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Carregar dados
+      </button>
+    </div>
+  </div>
+
+  <!-- CUSTO -->
+  <div id="page-custo" class="nav-page">
+    <div class="section-hdr"><div class="section-hdr-bar"></div><div class="section-hdr-title">Custo Franga Recriada</div></div>
+    <div class="upload-block">
+      <div class="upload-block-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h2>Custo Franga Recriada</h2>
+      <p>Carregue a planilha Excel com os dados de custo para visualizar os indicadores deste painel.</p>
+      <div class="drop-zone" id="dz-custo">
+        <input type="file" id="fi-custo" accept=".xlsx,.xls">
+        <div class="drop-icon">📊</div>
+        <div class="drop-text"><strong>Clique para selecionar</strong> ou arraste aqui</div>
+        <div class="drop-ext">Suportado: .xlsx · .xls</div>
+      </div>
+      <div class="upload-file-name" id="fn-custo"></div>
+      <div class="upload-error" id="err-custo"></div>
+      <button class="load-btn" id="btn-custo" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Carregar dados
+      </button>
+    </div>
+  </div>
+
+  <!-- CUSTO SEM MATRIZ/RAÇÃO -->
+  <div id="page-custosm" class="nav-page">
+    <div class="section-hdr"><div class="section-hdr-bar"></div><div class="section-hdr-title">Custo Franga — Sem Matriz e Ração</div></div>
+    <div class="upload-block">
+      <div class="upload-block-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h2>Custo S/ Matriz e Ração</h2>
+      <p>Carregue a planilha Excel com os dados de custo sem matriz e ração para visualizar os indicadores deste painel.</p>
+      <div class="drop-zone" id="dz-custosm">
+        <input type="file" id="fi-custosm" accept=".xlsx,.xls">
+        <div class="drop-icon">📊</div>
+        <div class="drop-text"><strong>Clique para selecionar</strong> ou arraste aqui</div>
+        <div class="drop-ext">Suportado: .xlsx · .xls</div>
+      </div>
+      <div class="upload-file-name" id="fn-custosm"></div>
+      <div class="upload-error" id="err-custosm"></div>
+      <button class="load-btn" id="btn-custosm" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Carregar dados
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">by Eduardo &amp; Antonio</div>
+
+<script>
+const PAGE_LABELS = {
+  viabilidade: 'Viabilidade de Recria',
+  racao:       'Ração / Fêmea',
+  custo:       'Custo Franga Recriada',
+  custosm:     'Custo S/ Matriz e Ração'
+};
+
+function setPage(page, el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('active-page-label').textContent = PAGE_LABELS[page] || '';
+}
+
+/* ── Upload por aba ── */
+const TABS = ['viabilidade', 'racao', 'custo', 'custosm'];
+
+TABS.forEach(tab => {
+  const dz  = document.getElementById('dz-' + tab);
+  const fi  = document.getElementById('fi-' + tab);
+  const fn  = document.getElementById('fn-' + tab);
+  const err = document.getElementById('err-' + tab);
+  const btn = document.getElementById('btn-' + tab);
+
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], fn, err, btn);
+  });
+  fi.addEventListener('change', () => {
+    if (fi.files[0]) handleFile(fi.files[0], fn, err, btn);
+  });
+  btn.addEventListener('click', () => {
+    /* placeholder — lógica de parse vai aqui */
+  });
+});
+
+function handleFile(file, fn, err, btn) {
+  err.classList.remove('visible');
+  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+    err.textContent = 'Formato inválido. Use .xlsx ou .xls.';
+    err.classList.add('visible');
+    btn.disabled = true;
+    return;
+  }
+  fn.textContent = '📎 ' + file.name;
+  fn.classList.add('visible');
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
